@@ -1,0 +1,352 @@
+
+class BankAccount
+    
+    
+    @@accountNo
+    @@username
+    @@allUsers = {"allAccountNumbers":{}}
+    @@currentuser = {}
+    
+    
+    def isUserAlreadyExist(username)
+      if @@allUsers[username]!=nil 
+        return true
+      else 
+        return false
+      end
+    end
+    
+    def createAccount(name,age,username,password)
+  
+        if @@allUsers[username]!=nil  
+          print("Username already Exist ! Please create another username ")
+          return false
+        end
+        
+        accountNo = rand(0..10000000).to_s
+      
+        @@allUsers[username] = 
+        {
+            "name":name ,
+            "age":age ,
+            "accountNo":accountNo,
+            "username":username,
+            "password":password,
+            "balance":0,
+            "transactions":[],
+            "isLoggedIn":false
+        
+        } 
+        
+        @@allUsers[:"allAccountNumbers"][accountNo]=username
+        
+        print("Account Created ")
+        return true
+        
+    end
+    
+    def loginUser(username,password)
+      
+      if @@allUsers[username]==nil
+        print("Please Create Account First \n")
+        return false
+        
+      elsif @@allUsers[username][:password]==password
+        
+        @@allUsers[username][:isLoggedIn]=true
+        @@currentuser=@@allUsers[username]
+        @@name=@@currentuser[:"name"]
+        @@username = username
+         
+        print("Logged in \n ")
+        
+        return true 
+        
+      else 
+        print("Password mismatched ! Please try again \n")
+        return false
+      end
+      
+    end
+    
+    def logOut
+      @@allUsers[@@username][:isLoggedIn]=true
+      @@currentuser={}
+      @@accountNo = ""
+      @@username = ""
+    end 
+    
+    def checkBalance
+      
+      return @@currentuser[:"balance"]
+    
+    end
+    
+    def withdrawCash(amount)
+      
+      if self.checkBalance()<amount 
+        print("Your balance is #{self.checkBalance} which is less than #{amount} \n")
+        return false
+        
+      else 
+        
+        @@allUsers[@@username][:"balance"]-=amount 
+        @@allUsers[@@username][:"transactions"].push("Withdraw #{amount}")
+        
+        @@currentuser = @@allUsers[@@username]
+        
+        print("\n Please collect Your Amount ")
+        
+        return true
+      end
+      
+      
+      
+    end
+    
+    def depositCash(amount)
+       
+      @@allUsers[@@username][:"balance"]+=amount 
+      @@allUsers[@@username][:"transactions"].push("Deposited #{amount}")
+      @@currentuser = @@allUsers[@@username]
+      
+      print("\n Deposited #{amount} to your account ")
+      
+    end
+    
+    
+    def printCurrentUser
+      print("\n" ,@@currentuser)
+    end
+    
+    def printAllUser
+        print("\n",@@allUsers)
+    end
+    
+    
+    def transferMoney(account,amount)
+      
+      if account==@@currentuser[:"accountNo"]
+        print("You can not transfer to your own account")
+        return false
+      
+      elsif @@allUsers[:"allAccountNumbers"][account]==nil 
+        print("Please Provide valid account number to Transfer \n")
+        return false
+      elsif self.checkBalance()<amount
+        
+        print("Can't transer money beacause your balance is low \n")
+        return false
+      else
+        self.withdrawCash(amount)
+        personUsername = @@allUsers[:"allAccountNumbers"][account]
+        
+        @@allUsers[personUsername][:"balance"]+=amount 
+        @@allUsers[personUsername][:"transactions"].push("Recieved #{amount} ")
+        return true
+      end
+      
+      
+    end
+    
+    def showPreviousTransactions
+      
+      print(@@currentuser[:transactions])
+      
+      return true 
+      
+    end
+    
+    
+
+end
+
+
+obj = BankAccount.new
+
+obj.createAccount("vivek","12","vivek","12345678")
+
+while true 
+  
+  print("\n Welcome to the bank
+  press
+  
+  1 -> Create an Account 
+  2 -> Login into Account 
+  3 -> Exit 
+  
+  ")
+  
+  input = gets.chomp()
+  
+  if input=="1"
+    
+    print("For Creating an Account Please Enter Following Details 
+    
+    Please Enter Your name -> 
+    
+    ")
+    
+    name = gets.chomp()
+    username = ""
+    password = ""
+    age = ""
+    
+    while true
+      print("Please Enter Your username \n ")
+      username = gets.chomp()
+      if obj.isUserAlreadyExist(username)
+        print("Username already exist! Please try again \n")
+      else 
+        break
+      end
+    end
+    
+    while true
+      print("Please Enter Password \n ")
+      password = gets.chomp 
+      
+      if password.length<8 
+        print("Please enter password minimun of length 8 \n")
+      else 
+        break 
+      end
+    
+    end 
+    while true 
+      print("Please Enter Your age \n")
+      age = gets.chomp()
+      
+      if age!=age.to_i.to_s
+        print("Please enter a valid integer age \n")
+      else 
+        break 
+      end
+  
+    end
+  
+    obj.createAccount(name,age,username,password)
+    obj.printAllUser()
+    
+  elsif input=="2"
+    
+    isLoggedOut=false
+    
+    while !isLoggedOut
+      print("Please Enter Your username \n ")
+      username = gets.chomp()
+      print("Please Enter Password \n ")
+      password = gets.chomp 
+      
+      if obj.loginUser(username,password)
+        print("\n Welcome to the account please Press enter the following keys 
+          for different purposes
+          
+        ")
+        while true
+          print(" 
+          1-> Check Balance 
+          2-> Past Transactions  
+          3-> Withdraw Cash 
+          4-> Deposit Cash 
+          5-> Tansfer Money 
+          6-> LogOut 
+          ")
+          
+          input = gets.chomp()
+          
+          case input 
+            when "1"
+              
+              print("Your balance is :-> ",obj.checkBalance())
+            when "2"
+              obj.showPreviousTransactions()
+            when "3"
+              print("\n Enter amount to Withdraw Cash ")
+              
+              while true
+                amount=gets.chomp()
+                if amount == amount.to_i.to_s
+                  obj.withdrawCash(amount.to_i)
+                  break
+                elsif amount==amount.to_f.to_s 
+                  obj.withdrawCash(amount.to_f)
+                  break
+                else 
+                  print("\n Please ENTER valid Amount ")
+                end 
+                
+                
+              end
+            when "4"
+              print("\n Enter amount to Deposit Cash ")
+              
+              while true
+                amount=gets.chomp()
+                if amount == amount.to_i.to_s
+                  obj.depositCash(amount.to_i)
+                  break
+                elsif amount==amount.to_f.to_s 
+                  obj.depositCash(amount.to_f)
+                  break
+                else 
+                  print("\n Please ENTER valid Amount ")
+                end 
+                
+                
+              end
+            when "5"
+              
+               while true
+                print("\n Please Enter Account to transfer ")
+                account=gets.chomp()
+                if account == account.to_i.to_s
+                  break
+                else 
+                  print("\n Please ENTER valid Account Number ")
+                end 
+              end
+         
+              while true
+                print("\n Please Enter amount to transfer ")
+                amount=gets.chomp()
+                if amount == amount.to_i.to_s
+                  amount = amount.to_i
+                  break
+                elsif amount==amount.to_f.to_s 
+                  amount = amount.to_f
+                  break
+                else 
+                  print("\n Please ENTER valid Amount ")
+                end 
+              end
+              
+              if obj.transferMoney(account,amount)
+                print("#{amount} tranferred to #{account} ")
+              else 
+                print("Amount not tranferred ")
+              end
+            
+            when "6"
+              print("Logged Out ")
+              isLoggedOut=true
+              break
+              
+          end 
+          
+        end 
+        
+      end
+      
+    end 
+    
+    
+  elsif input=="3"
+    print("Bye !")
+    break
+  else 
+    print("Please ENTER Valid input \n")
+  end 
+  
+
+end
