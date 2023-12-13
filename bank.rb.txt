@@ -84,7 +84,11 @@ class BankAccount
     
     def withdrawCash(amount)
       
-      if self.checkBalance()<amount 
+      if amount<0
+        print("\n Can not withdraw negative amount ")
+        return false
+      
+      elsif self.checkBalance()<amount
         print("Your balance is #{self.checkBalance} which is less than #{amount} \n")
         return false
         
@@ -105,7 +109,11 @@ class BankAccount
     end
     
     def depositCash(amount)
-       
+      if amount<0
+        print("\n Can not deposit negative amount ")
+        return false
+      end
+      
       @@allUsers[@@username][:"balance"]+=amount 
       @@allUsers[@@username][:"transactions"].push("Deposited #{amount}")
       @@currentuser = @@allUsers[@@username]
@@ -133,6 +141,8 @@ class BankAccount
       elsif @@allUsers[:"allAccountNumbers"][account]==nil 
         print("Please Provide valid account number to Transfer \n")
         return false
+      elsif amount<0
+        print("Can not tranfer negative amount \n")
       elsif self.checkBalance()<amount
         
         print("Can't transer money beacause your balance is low \n")
