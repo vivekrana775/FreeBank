@@ -197,10 +197,17 @@ while true
     
     ")
     
-    name = gets.chomp()
+    name = ""
     username = ""
     password = ""
     age = ""
+    
+    while true
+        name=gets.chomp()
+        if name.length<=0 or name.include?" "
+            print("\n Name cannot have space chars or length is zero ")
+        end
+    end
     
     while true
       print("Please Enter Your username \n ")
@@ -213,13 +220,40 @@ while true
     end
     
     while true
-      print("Please Enter Password \n ")
-      password = gets.chomp 
+      print("
+      Password must contain at least one special character 
+      one number 
+      and must be atleast 8 characters long 
       
-      if password.length<8 
-        print("Please enter password minimun of length 8 \n")
+      Please Enter Password,
+      \n")
+      
+      password = gets.chomp 
+      hasSpecial=false 
+      hasNum = false 
+      isLengthGood=false 
+      specialChars="!@#$%^&*()"
+      numbers="1234567890"
+      
+      password.length>=8? isLengthGood=true : isLengthGood=false
+     
+      for i in 0..specialChars.length-1
+        if password.include?(specialChars[i])
+            hasSpecial=true 
+        end
+        
+      end
+      
+      for i in 0..numbers.length-1
+        if password.include?(numbers[i])
+            hasNum=true 
+        end
+      end
+      
+      if hasSpecial && isLengthGood && hasNum
+        break
       else 
-        break 
+        print("\n Password not strong enough ")
       end
     
     end 
